@@ -1,23 +1,23 @@
 import { useEffect } from 'react'
-import { DataResponse, useAxios } from '~/hooks'
+import { DataResponse, useAuth, useAxios } from '~/hooks'
 
 export function HomePage() {
-  // console.log(import.meta.env.VITE_API_ENDPOINT)
+  const { logout } = useAuth()
+  const { response, error, isLoading } = useAxios<DataResponse>('get', '/user/profile')
 
-  const body = {
-    email: 'a0707@gmail.com',
-    password: 'P@ssw0rd',
-    firstName: 'David',
-    lastName: 'Nop',
-    phone: '0911782046'
+  const handleLogout = () => {
+    logout()
   }
-
-  const { response, error, isLoading, fetchData } = useAxios<DataResponse>('get', '/user/profile')
 
   useEffect(() => {
     if (response) {
       console.log(response)
     }
   }, [response, error, isLoading])
-  return <div>Home</div>
+  return (
+    <div>
+      <div>Home</div>
+      <button onClick={handleLogout}>Logout</button>
+    </div>
+  )
 }
