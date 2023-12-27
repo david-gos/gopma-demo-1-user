@@ -1,7 +1,6 @@
 export * from './AuthProvider'
 export * from './AuthenBackground'
 export * from './AuthenForm'
-export * from './DatePicker'
 export * from './Footer'
 export * from './Header'
 export * from './InputFieldCT'

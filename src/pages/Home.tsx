@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { DataResponse, useAxios } from '~/hooks'
 
 export function HomePage() {
@@ -13,16 +14,10 @@ export function HomePage() {
 
   const { response, error, isLoading, fetchData } = useAxios<DataResponse>('get', '/user/profile')
 
-  const handleTL = async () => {
-    fetchData()
-    // console.log(res)
-
-    // if (response) console.log(response)
-    // if (error) console.log(error)
-    // if (isLoading) console.log(isLoading)
-  }
-  console.log('aa', response)
-  console.log('aa', error)
-  console.log('aa', isLoading)
-  return <button onClick={handleTL}>Home</button>
+  useEffect(() => {
+    if (response) {
+      console.log(response)
+    }
+  }, [response, error, isLoading])
+  return <div>Home</div>
 }
