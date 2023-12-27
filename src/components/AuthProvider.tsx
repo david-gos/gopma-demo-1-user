@@ -1,5 +1,6 @@
-import { useLocalStorage } from '@/hooks'
 import { PropsWithChildren, createContext } from 'react'
+
+import { useLocalStorage } from '~/hooks'
 
 interface AuthContextProps {
   token: string
