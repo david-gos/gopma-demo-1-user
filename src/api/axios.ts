@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU0YWQ0YmQyLTU1NDgtNDBlYS1hZGU1LTA1N2IwNjQyMTM1YSIsImlhdCI6MTcwMzQ5MzMxM30.gPKGId6h4m9WH0DCKzT70737lf8t3NS9EfBOEo0RSqE'
+const storedToken: string | null = localStorage.getItem('accessToken')
+const token: string | null = typeof storedToken === 'string' ? JSON.parse(storedToken) : null
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,

@@ -1,5 +1,5 @@
-import { AuthContext } from '@/components'
 import { useCallback, useContext } from 'react'
+import { AuthContext } from '~/components'
 
 export function useAuth() {
   const { token, setToken } = useContext(AuthContext)
