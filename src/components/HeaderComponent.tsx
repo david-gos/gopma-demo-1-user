@@ -10,16 +10,17 @@ import Menu from '@mui/material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import React from 'react'
+import React, { ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector, useAuth } from '~/hooks'
 
-export function HeaderComponent() {
+export function HeaderComponent(props: { children: ReactNode }) {
+  const { children } = props
   const { logout } = useAuth()
   const navigate = useNavigate()
   const userInfo = useAppSelector((state) => state.usersReducer.user)
 
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget)
@@ -53,6 +54,7 @@ export function HeaderComponent() {
                 LOGO
               </Typography>
             </Box>
+            {children}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

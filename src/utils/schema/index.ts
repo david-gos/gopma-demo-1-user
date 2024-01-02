@@ -23,6 +23,22 @@ export type CreateUserInput = {
   repassword: Scalars['String']['input']
 }
 
+export type UserInfoOutput = {
+  email: Scalars['String']['output']
+  phone: Scalars['String']['output']
+  firstName: Scalars['String']['output']
+  lastName: Scalars['String']['output']
+  dob: Scalars['Date']['output']
+  gender: Scalars['String']['output']
+}
+
+export type ProfileUserInput = {
+  firstName: Scalars['String']['input']
+  lastName: Scalars['String']['input']
+  dob?: Scalars['String']['input']
+  gender?: Scalars['String']['input']
+}
+
 export type LoginUserInput = {
   username: Scalars['String']['input']
   password: Scalars['String']['input']

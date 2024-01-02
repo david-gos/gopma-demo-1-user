@@ -3,13 +3,14 @@ import { Box, Card, FilledInput, FormControl, InputLabel, MenuItem, Select, Sele
 import { DatePicker } from '@mui/x-date-pickers'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { Dayjs } from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
+import api from '~/api/axios'
 
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
-import { DataResponse, useAxios, useToast } from '~/hooks'
+import { useToast } from '~/hooks'
 import { Gender } from '~/utils'
 import { CreateUserInput } from '~/utils/schema'
 
@@ -53,7 +54,6 @@ export function RegisterPage() {
     formState: { errors }
   } = useForm<CreateUserInput>({ resolver: yupResolver(schema) })
 
-  const { response, error, isLoading, fetchData } = useAxios<DataResponse>('post', '/auth/register')
   const toast = useToast()
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState('')
@@ -63,22 +63,27 @@ export function RegisterPage() {
     setSelected(event.target.value)
   }
 
-  const onSubmitRegister = async (dataInput: object) => {
-    fetchData(dataInput)
-  }
+  const handleSubmitRegister = async (dataInput: CreateUserInput) => {
+    setLoading(true)
 
-  useEffect(() => {
-    setLoading(isLoading)
-    if (response) {
+    try {
+      const response = await api.auth.register(dataInput)
       console.log(response)
+
       navigate('/login')
       toast({ message: 'Register successful! You can login now.', status: 'success' })
-    }
+    } catch (error: any) {
+      console.log(error)
 
-    if (error) {
-      toast({ message: error.message, status: 'error' })
+      toast({ message: error?.message, status: 'error' })
+    } finally {
+      setLoading(false)
     }
-  }, [response, error, isLoading])
+  }
+
+  const onSubmitRegister = async (dataInput: CreateUserInput): Promise<void> => {
+    handleSubmitRegister(dataInput)
+  }
 
   return (
     <Card sx={{ display: 'flex', width: '950px', minWidth: '300px', height: '98vh' }}>

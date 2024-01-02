@@ -12,13 +12,13 @@ import theme from './styles/theme'
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <ToastProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ToastProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <RouterProvider router={router} />
           </LocalizationProvider>
-        </AuthProvider>
-      </ToastProvider>
+        </ToastProvider>
+      </AuthProvider>
     </ThemeProvider>
   )
 }

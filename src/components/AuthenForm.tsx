@@ -5,10 +5,21 @@ import { LoadingButton } from '@mui/lab'
 import { Box, Button, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 
+import { ReactNode } from 'react'
 import { LoadingComponent } from '.'
 
-export function AuthenForm(_props: any) {
-  const { isSignUp, handleSubmit, onSubmitForm, isLoading, title, formDescription } = _props
+interface AuthenFormProps {
+  isSignUp?: boolean
+  handleSubmit: any
+  onSubmitForm: (dataInput: any) => Promise<void>
+  children: ReactNode
+  title: string
+  formDescription: string
+  isLoading: boolean
+}
+
+export function AuthenForm(props: AuthenFormProps) {
+  const { isSignUp, isLoading, title, formDescription, handleSubmit, onSubmitForm, children } = props
 
   return (
     <Box sx={{ width: '800px', minWidth: '500px', overflow: 'auto' }}>
@@ -66,7 +77,7 @@ export function AuthenForm(_props: any) {
           </Typography>
         </Box>
         <Box component='form' onSubmit={handleSubmit(onSubmitForm)}>
-          {_props.children}
+          {children}
           <Box>
             <Box sx={{ textAlignLast: 'center' }}>
               {!isSignUp && (

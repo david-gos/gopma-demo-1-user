@@ -1,23 +1,6 @@
-import { useEffect } from 'react'
-import { DataResponse, useAuth, useAxios } from '~/hooks'
+import { Box } from '@mui/material'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 
 export function HomePage() {
-  const { logout } = useAuth()
-  const { response, error, isLoading } = useAxios<DataResponse>('get', '/user/profile')
-
-  const handleLogout = () => {
-    logout()
-  }
-
-  useEffect(() => {
-    if (response) {
-      console.log(response)
-    }
-  }, [response, error, isLoading])
-  return (
-    <div>
-      <div>Home</div>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
-  )
+  return <Box></Box>
 }

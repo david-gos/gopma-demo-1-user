@@ -10,7 +10,9 @@ const theme = createTheme({
       contrastText: '#fff'
     },
     secondary: {
-      main: grey[800],
+      light: teal[200],
+      main: grey[600],
+      dark: grey[800],
       contrastText: '#fff'
     }
   },
@@ -26,7 +28,11 @@ const theme = createTheme({
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"'
-    ].join(',')
+    ].join(','),
+    subtitle2: {
+      fontSize: '14px',
+      fontWeight: '400'
+    }
   }
 })
 
