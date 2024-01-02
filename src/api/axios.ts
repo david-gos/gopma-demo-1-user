@@ -1,39 +1,55 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
+import { CreateUserInput, LoginUserInput, ProfileUserInput, UserInfoOutput } from '~/utils'
 
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU0YWQ0YmQyLTU1NDgtNDBlYS1hZGU1LTA1N2IwNjQyMTM1YSIsImlhdCI6MTcwMzQ5MzMxM30.gPKGId6h4m9WH0DCKzT70737lf8t3NS9EfBOEo0RSqE'
+export interface DataResponse {
+  status: string
+  message: string
+  data: any
+  accessToken: string
+}
 
-const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`
+const storedToken: string | null = localStorage.getItem('accessToken')
+const token: string | null = typeof storedToken === 'string' ? JSON.parse(storedToken) : null
+
+axios.defaults.baseURL = import.meta.env.VITE_API_ENDPOINT
+
+axios.interceptors.request.use((config) => {
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
+  return config
 })
 
-axiosClient.interceptors.request.use((config) => config)
-
-axiosClient.interceptors.response.use(
+axios.interceptors.response.use(
   (response) => {
-    if (response && response.data) {
-      return response.data
-    }
-    return response
+    return response?.data ?? response
   },
   (error) => {
-    if (error && error.response && error.response.data) {
-      return Promise.reject(error.response.data)
-    }
-    return Promise.reject(error)
+    return Promise.reject(error?.response?.data ?? error)
   }
 )
 
-const axiosPrivate = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  withCredentials: true
-})
+const responseBody = <T>(response: AxiosResponse<T>) => response.data
 
-export { axiosClient, axiosPrivate }
+const request = {
+  get: <T>(url: string) => axios.get<T>(url).then(responseBody),
+  post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(responseBody),
+  patch: <T>(url: string, body: {}) => axios.patch<T>(url, body).then(responseBody)
+}
+
+const auth = {
+  login: (data: LoginUserInput) => request.post<DataResponse>('/auth/login', data),
+  register: (data: CreateUserInput) => request.post<void>('/auth/register', data)
+}
+
+const users = {
+  getInfo: () => request.get<UserInfoOutput>('/user/profile'),
+  updateInfo: (data: ProfileUserInput) => request.patch<DataResponse>('/user', data)
+}
+
+const api = {
+  auth,
+  users
+}
+
+export default api
