@@ -1,9 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { UserInfoOutput } from '~/utils'
+import { UserInfoOutput } from '~/services/user/dto'
 import { RootState } from '../store'
 
-const initialState = {
-  user: {} as UserInfoOutput | null
+export interface UserState {
+  user: UserInfoOutput | null
+  isLoading: boolean
+}
+
+const initialState: UserState = {
+  user: null,
+  isLoading: false
 }
 
 export const userSlice = createSlice({

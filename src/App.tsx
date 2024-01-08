@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from './routes/route'
 
 import { ThemeProvider } from '@mui/material'
-import { AuthProvider, ToastProvider } from './components'
+import { AuthProvider, LoadingComponent, ToastProvider } from './components'
 import './styles/App.scss'
 import theme from './styles/theme'
 
@@ -16,6 +16,7 @@ function App() {
         <ToastProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <RouterProvider router={router} />
+            <LoadingComponent />
           </LocalizationProvider>
         </ToastProvider>
       </AuthProvider>

@@ -17,13 +17,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import api from '~/api/axios'
 import { banner_profile } from '~/assets/image'
 
-import { useAppDispatch, useAppSelector, useToast } from '~/hooks'
+import { useAppDispatch, useToast } from '~/hooks'
+import { userService } from '~/services'
+import { GENDER, ProfileUserInput, UserInfoOutput } from '~/services/user/dto'
 import { updateUser } from '~/store/reducers/userSlice'
-import { Gender, areObjectsChange, mapStringToEnum } from '~/utils'
-import { ProfileUserInput } from '~/utils/schema'
+import { areObjectsChange, mapStringToEnum } from '~/utils'
 
 const schema = yup.object({
   firstName: yup.string().required('First name is required'),
@@ -34,37 +34,46 @@ const schema = yup.object({
 
 const gender = [
   {
-    value: Gender.MALE,
+    value: GENDER.MALE,
     title: 'Male'
   },
   {
-    value: Gender.FEMALE,
+    value: GENDER.FEMALE,
     title: 'Female'
   },
   {
-    value: Gender.OTHER,
+    value: GENDER.OTHER,
     title: 'Other'
   }
 ]
 
-export function ProfilePage() {
+interface ProfileFormProps {
+  userInfo: UserInfoOutput
+}
+
+export default function ProfileForm({ userInfo }: ProfileFormProps) {
+  const dispatch = useAppDispatch()
+  const toast = useToast()
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors }
-  } = useForm<ProfileUserInput>({ resolver: yupResolver(schema) })
-
-  const dispatch = useAppDispatch()
-  const toast = useToast()
-  const userInfo = useAppSelector((state) => state.usersReducer.user)
+  } = useForm<ProfileUserInput>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      firstName: userInfo.firstName ,
+      lastName: userInfo.lastName,
+      dob: userInfo.dob ,
+      gender: userInfo.gender 
+    }
+  })
 
   const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<Gender | undefined | string>(
-    userInfo ? mapStringToEnum(Gender, userInfo?.gender) : ''
+  const [selected, setSelected] = useState<GENDER | undefined | string>(
+    userInfo ? mapStringToEnum(GENDER, userInfo?.gender) : ''
   )
-
-  console.log(userInfo)
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelected(event.target.value)
@@ -73,9 +82,9 @@ export function ProfilePage() {
   const handleSubmitUpdate = async (dataInput: ProfileUserInput) => {
     setLoading(true)
     try {
-      const response = await api.users.updateInfo(dataInput)
+      const response = await userService.updateInfo(dataInput)
 
-      dispatch(updateUser(response))
+      dispatch(updateUser(response.data))
       toast({ message: 'Profile updated successfully!', status: 'success' })
     } catch (error) {
       console.log(error)
@@ -93,6 +102,10 @@ export function ProfilePage() {
       toast({ message: 'No changes to the profile!', status: 'error' })
     }
   }
+
+  // useEffect(() => {
+  //   if (userInfo) setValue('lastName', userInfo.lastName)
+  // }, [userInfo])
 
   return (
     <Box sx={{ width: '50%', minWidth: '400px', m: 'auto', mt: '10px' }}>
@@ -112,21 +125,21 @@ export function ProfilePage() {
           error={Boolean(errors['firstName'])}
           {...register('firstName')}
           sx={{ fontSize: '16px', my: 1, width: '100%' }}
-          type='text'
-          defaultValue={userInfo?.firstName}
         />
 
         <TextField
           id='filled-basic'
           variant='filled'
           label='Last Name'
-          defaultValue={userInfo?.lastName}
           error={Boolean(errors['lastName'])}
           {...register('lastName')}
-          sx={{ fontSize: '16px', my: 1, width: '100%' }}
-          type='text'
+          sx={{
+            fontSize: '16px',
+            my: 1,
+            width: '100%'
+          }}
         />
-        <Box sx={{ display: 'flex', gap: '36px' }}>
+        <Box sx={{ display: 'flex', gap: '36px', justifyContent: 'space-between' }}>
           <DemoContainer components={['DatePicker']}>
             <DatePicker
               label={'Date of birth'}
@@ -139,13 +152,13 @@ export function ProfilePage() {
                 textField: {
                   variant: 'filled',
                   sx: {
-                    width: '100%'
+                    width: 350
                   }
                 }
               }}
             />
           </DemoContainer>
-          <FormControl variant='filled' sx={{ minWidth: 130, my: 1 }}>
+          <FormControl variant='filled' sx={{ width: 350, my: 1 }}>
             <InputLabel id='demo-simple-select-filled-label'>Gender</InputLabel>
             <Select
               value={selected}

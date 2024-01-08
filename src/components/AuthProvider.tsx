@@ -1,4 +1,5 @@
-import { PropsWithChildren, createContext } from 'react'
+import { PropsWithChildren, createContext, useEffect } from 'react'
+import { setAuthorizationToken } from '~/api/axios'
 
 import { useLocalStorage } from '~/hooks'
 
@@ -15,6 +16,9 @@ export const AuthContext = createContext<AuthContextProps>({
 export function AuthProvider({ children }: PropsWithChildren) {
   const [token, setToken] = useLocalStorage('accessToken', '')
 
+  useEffect(() => {
+    setAuthorizationToken(token)
+  }, [token])
   return (
     <AuthContext.Provider
       value={{

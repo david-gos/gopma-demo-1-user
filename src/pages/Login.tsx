@@ -1,13 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Card, FilledInput, FormControl, InputLabel } from '@mui/material'
-import { useState } from 'react'
+import { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import api from '~/api/axios'
 
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
-import { useAuth, useToast } from '~/hooks'
-import { LoginUserInput } from '~/utils/schema'
+import { useAppDispatch, useAuth, useToast } from '~/hooks'
+import { authService } from '~/services'
+import { LoginUserInput } from '~/services/auth/dto'
+import { setLoading } from '~/store/reducers'
 
 const schema = yup.object({
   username: yup.string().required('Username is required'),
@@ -23,22 +24,23 @@ export function LoginPage() {
 
   const { login } = useAuth()
   const toast = useToast()
-  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
 
   const handleSubmitLogin = async (dataInput: LoginUserInput) => {
-    setLoading(true)
+    dispatch(setLoading(true))
     try {
-      const response = await api.auth.login(dataInput)
+      const response = await authService.login(dataInput)
       console.log(response)
 
       toast({ message: 'Login successful!', status: 'success' })
-      login(response?.accessToken)
-    } catch (error: any) {
-      console.log(error)
+      login(response.data.accessToken)
+    } catch (error) {
+      const axiosError = error as AxiosError
+      toast({ message: axiosError.message, status: 'error' })
 
-      toast({ message: error.message, status: 'error' })
+      console.log(axiosError)
     } finally {
-      setLoading(false)
+      dispatch(setLoading(false))
     }
   }
 
@@ -51,7 +53,6 @@ export function LoginPage() {
       <AuthenForm
         title={'Sign In'}
         formDescription={'or use your account:'}
-        isLoading={loading}
         handleSubmit={handleSubmit}
         onSubmitForm={onSubmitLogin}
       >

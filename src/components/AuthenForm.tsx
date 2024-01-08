@@ -6,7 +6,8 @@ import { Box, Button, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 
 import { ReactNode } from 'react'
-import { LoadingComponent } from '.'
+import { useAppSelector } from '~/hooks'
+import { selectLoading } from '~/store/reducers'
 
 interface AuthenFormProps {
   isSignUp?: boolean
@@ -15,11 +16,12 @@ interface AuthenFormProps {
   children: ReactNode
   title: string
   formDescription: string
-  isLoading: boolean
 }
 
 export function AuthenForm(props: AuthenFormProps) {
-  const { isSignUp, isLoading, title, formDescription, handleSubmit, onSubmitForm, children } = props
+  const { isSignUp, title, formDescription, handleSubmit, onSubmitForm, children } = props
+
+  const select = useAppSelector(selectLoading)
 
   return (
     <Box sx={{ width: '800px', minWidth: '500px', overflow: 'auto' }}>
@@ -95,10 +97,10 @@ export function AuthenForm(props: AuthenFormProps) {
               <div>
                 <LoadingButton
                   type='submit'
-                  loading={isLoading}
+                  loading={select.isLoading}
                   loadingPosition='center'
                   variant='contained'
-                  disabled={isLoading}
+                  disabled={select.isLoading}
                   sx={{ width: '100%', marginTop: '.4rem' }}
                 >
                   <span>{title}</span>
@@ -108,7 +110,6 @@ export function AuthenForm(props: AuthenFormProps) {
           </Box>
         </Box>
       </Box>
-      <LoadingComponent isLoading={isLoading} />
     </Box>
   )
 }

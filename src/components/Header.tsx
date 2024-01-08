@@ -35,7 +35,7 @@ export function HeaderComponent() {
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <AdbIcon sx={{ display: { md: 'flex' }, mr: 1, color: 'primary.main' }} />
+              <AdbIcon sx={{ display: { md: 'flex' }, mr: 1, color: 'secondary.dark' }} />
               <Typography
                 variant='h6'
                 noWrap
@@ -46,7 +46,6 @@ export function HeaderComponent() {
                   display: { xs: 'none', md: 'flex' },
                   fontWeight: 700,
                   letterSpacing: '.3rem',
-                  color: 'primary.main',
                   textDecoration: 'none'
                 }}
               >
@@ -58,7 +57,7 @@ export function HeaderComponent() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title='Open settings'>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar sx={{ width: '25px', height: '25px', backgroundColor: 'primary.main' }} />
+                <Avatar sx={{ width: '25px', height: '25px' }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -78,10 +77,10 @@ export function HeaderComponent() {
               onClose={handleCloseUserMenu}
             >
               <Box sx={{ p: '6px 16px', width: '15rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Avatar sx={{ width: '30px', height: '30px', backgroundColor: 'primary.main' }} />
+                <Avatar sx={{ width: '30px', height: '30px', backgroundColor: 'primary' }} />
                 <Box>
-                  <Typography variant='subtitle2'>{userInfo?.firstName + ' ' + userInfo?.lastName}</Typography>
-                  <Typography variant='subtitle2'>{userInfo?.email}</Typography>
+                  <Typography variant='subtitle1'>{userInfo?.firstName + ' ' + userInfo?.lastName}</Typography>
+                  <Typography variant='subtitle1'>{userInfo?.email}</Typography>
                 </Box>
               </Box>
               <Divider />
@@ -90,13 +89,13 @@ export function HeaderComponent() {
                   navigate('/profile'), handleCloseUserMenu()
                 }}
               >
-                <Typography variant='subtitle1'>Profile</Typography>
+                <Typography variant='h6'>Profile</Typography>
               </MenuItem>
               <MenuItem
                 onClick={() => logout()}
                 sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
               >
-                <Typography variant='subtitle1'>Logout</Typography>
+                <Typography variant='h6'>Logout</Typography>
                 <Logout sx={{ width: '20px', height: '20px', color: 'secondary.main' }} />
               </MenuItem>
             </Menu>

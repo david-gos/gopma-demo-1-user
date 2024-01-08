@@ -2,17 +2,19 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Card, FilledInput, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { AxiosError } from 'axios'
 import { Dayjs } from 'dayjs'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
-import api from '~/api/axios'
 
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
-import { useToast } from '~/hooks'
-import { Gender } from '~/utils'
-import { CreateUserInput } from '~/utils/schema'
+import { useAppDispatch, useToast } from '~/hooks'
+import { authService } from '~/services'
+import { CreateUserInput } from '~/services/auth/dto'
+import { GENDER } from '~/services/user/dto'
+import { setLoading } from '~/store/reducers'
 
 const schema = yup.object({
   email: yup.string().email('This field must be a Email').required('Email is required'),
@@ -33,15 +35,15 @@ const schema = yup.object({
 
 const gender = [
   {
-    value: Gender.MALE,
+    value: GENDER.MALE,
     title: 'Male'
   },
   {
-    value: Gender.FEMALE,
+    value: GENDER.FEMALE,
     title: 'Female'
   },
   {
-    value: Gender.OTHER,
+    value: GENDER.OTHER,
     title: 'Other'
   }
 ]
@@ -55,7 +57,7 @@ export function RegisterPage() {
   } = useForm<CreateUserInput>({ resolver: yupResolver(schema) })
 
   const toast = useToast()
-  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
   const [selected, setSelected] = useState('')
   const navigate = useNavigate()
 
@@ -64,20 +66,19 @@ export function RegisterPage() {
   }
 
   const handleSubmitRegister = async (dataInput: CreateUserInput) => {
-    setLoading(true)
-
+    dispatch(setLoading(true))
     try {
-      const response = await api.auth.register(dataInput)
-      console.log(response)
+      await authService.register(dataInput)
 
       navigate('/login')
       toast({ message: 'Register successful! You can login now.', status: 'success' })
-    } catch (error: any) {
-      console.log(error)
+    } catch (error) {
+      const axiosError = error as AxiosError
 
-      toast({ message: error?.message, status: 'error' })
+      toast({ message: axiosError.message, status: 'error' })
+      console.log(axiosError)
     } finally {
-      setLoading(false)
+      dispatch(setLoading(false))
     }
   }
 
@@ -91,7 +92,6 @@ export function RegisterPage() {
         title='Sign Up'
         formDescription='or use your email for registration:'
         isSignUp
-        isLoading={loading}
         handleSubmit={handleSubmit}
         onSubmitForm={onSubmitRegister}
       >

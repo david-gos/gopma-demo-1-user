@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { FilledInput, FormControl, IconButton, InputAdornment, InputLabel } from '@mui/material'
 import { FieldErrors } from 'react-hook-form'
-import { CreateUserInput } from '~/utils'
+import { CreateUserInput } from '~/services/auth/dto'
 
 interface InputFieldCTProps {
   title: string

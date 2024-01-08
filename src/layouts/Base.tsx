@@ -1,27 +1,35 @@
+import { Box } from '@mui/material'
+import { AxiosError } from 'axios'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import api from '~/api/axios'
-import { HeaderComponent } from '~/components'
+import { HeaderComponent, SideBar } from '~/components'
 import { useAppDispatch, useAuth } from '~/hooks'
+import { userService } from '~/services'
 import { updateUser } from '~/store/reducers/userSlice'
 
 export function BaseLayout() {
-  const { isAuth } = useAuth()
+  const { isAuth, logout } = useAuth()
   const dispatch = useAppDispatch()
 
   const handleAuth = async () => {
     try {
-      const response = await api.users.getInfo()
+      const response = await userService.getInfo()
       console.log('profile: ', response)
 
-      dispatch(updateUser(response))
+      dispatch(updateUser(response.data))
     } catch (error) {
-      console.log(error)
+      const axiosError = error as AxiosError
+
+      console.log(axiosError)
+
+      if (axiosError.message === 'Unauthorized') logout()
     }
   }
 
   useEffect(() => {
     if (isAuth) {
+      console.log(isAuth)
+
       handleAuth()
     }
   }, [isAuth])
@@ -30,7 +38,11 @@ export function BaseLayout() {
   return (
     <>
       <HeaderComponent />
-      <Outlet />
+      <Box width='100%'>
+        <SideBar>
+          <Outlet />
+        </SideBar>
+      </Box>
     </>
   )
 }
