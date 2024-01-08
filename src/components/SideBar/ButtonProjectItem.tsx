@@ -1,11 +1,12 @@
 import StarRoundedIcon from '@mui/icons-material/StarRounded'
 import { Box, Button, Icon, Typography } from '@mui/material'
 import { bg_card } from '~/assets/image'
+import { ProjectInfoOutput } from '~/services/project'
 
 interface ButtonProjectItem {
-  name: string
+  item: ProjectInfoOutput
 }
-export function ButtonProjectItem({ name }: ButtonProjectItem) {
+export function ButtonProjectItem({ item }: ButtonProjectItem) {
   return (
     <Button
       variant='nav'
@@ -27,7 +28,7 @@ export function ButtonProjectItem({ name }: ButtonProjectItem) {
               whiteSpace: 'nowrap'
             }}
           >
-            {name}
+            {item.name}
           </Typography>
         </Box>
       }

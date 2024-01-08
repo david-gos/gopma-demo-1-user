@@ -21,7 +21,7 @@ import { banner_profile } from '~/assets/image'
 
 import { useAppDispatch, useToast } from '~/hooks'
 import { userService } from '~/services'
-import { GENDER, ProfileUserInput, UserInfoOutput } from '~/services/user/dto'
+import { GENDER, ProfileUserInput, UserInfoOutput, gender } from '~/services/user/dto'
 import { updateUser } from '~/store/reducers/userSlice'
 import { areObjectsChange, mapStringToEnum } from '~/utils'
 
@@ -31,21 +31,6 @@ const schema = yup.object({
   dob: yup.string(),
   gender: yup.string()
 })
-
-const gender = [
-  {
-    value: GENDER.MALE,
-    title: 'Male'
-  },
-  {
-    value: GENDER.FEMALE,
-    title: 'Female'
-  },
-  {
-    value: GENDER.OTHER,
-    title: 'Other'
-  }
-]
 
 interface ProfileFormProps {
   userInfo: UserInfoOutput
@@ -63,10 +48,10 @@ export default function ProfileForm({ userInfo }: ProfileFormProps) {
   } = useForm<ProfileUserInput>({
     resolver: yupResolver(schema),
     defaultValues: {
-      firstName: userInfo.firstName ,
+      firstName: userInfo.firstName,
       lastName: userInfo.lastName,
-      dob: userInfo.dob ,
-      gender: userInfo.gender 
+      dob: userInfo.dob,
+      gender: userInfo.gender
     }
   })
 
@@ -80,6 +65,8 @@ export default function ProfileForm({ userInfo }: ProfileFormProps) {
   }
 
   const handleSubmitUpdate = async (dataInput: ProfileUserInput) => {
+    console.log(dataInput)
+
     setLoading(true)
     try {
       const response = await userService.updateInfo(dataInput)
@@ -108,7 +95,7 @@ export default function ProfileForm({ userInfo }: ProfileFormProps) {
   // }, [userInfo])
 
   return (
-    <Box sx={{ width: '50%', minWidth: '400px', m: 'auto', mt: '10px' }}>
+    <Box sx={{ width: '600px', minWidth: '400px', m: 'auto', mt: '10px' }}>
       <Box component='form' onSubmit={handleSubmit(onSubmitUpdate)} sx={{ p: '25px 80px' }}>
         <Box sx={{ width: '100%' }}>
           <img width={'100%'} src={banner_profile} alt='Banner profile' />

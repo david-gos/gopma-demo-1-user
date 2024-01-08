@@ -6,7 +6,7 @@ export interface AlertSlice {
   title: string
   content: string
   confirm: boolean
-  name: string
+  id: string
 }
 
 const initialState: AlertSlice = {
@@ -14,30 +14,38 @@ const initialState: AlertSlice = {
   title: '',
   content: '',
   confirm: false,
-  name: ''
+  id: ''
 }
 
 export const alertSlice = createSlice({
   name: 'alert',
   initialState,
   reducers: {
-    setOpenAlert: (state, action) => {
-      state.isOpen = true
+    setAlert: (state, action) => {
+      state.isOpen = action.payload.isOpen
       state.title = action.payload.title
       state.content = action.payload.content
-      state.name = action.payload.name
+      state.id = action.payload.id
+      state.confirm = action.payload.confirm
     },
     setCloseAlert: (state, action) => {
       state.isOpen = false
       state.title = ''
       state.content = ''
-      state.name = action.payload.name
+      state.id = action.payload.id
       state.confirm = action.payload.confirm
+    },
+    removeAlert: (state) => {
+      state.isOpen = false
+      state.title = ''
+      state.content = ''
+      state.id = ''
+      state.confirm = false
     }
   }
 })
 
-export const { setOpenAlert, setCloseAlert } = alertSlice.actions
+export const { setAlert, setCloseAlert, removeAlert } = alertSlice.actions
 
 export const selectAlert = (state: RootState) => state.alertReducer
 

@@ -5,11 +5,11 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined'
 import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined'
 import { Box, Button, Icon, IconButton, Slide, Typography } from '@mui/material'
-// import Grid2 from '@mui/material/Unstable_Grid2'
 import { ReactNode, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { image_profile } from '~/assets/image'
 import { useAppSelector } from '~/hooks'
+import { selectProjects, selectUserProfile } from '~/store/reducers'
 import { ButtonProjectItem } from './ButtonProjectItem'
 
 interface SideBarProps {
@@ -18,7 +18,8 @@ interface SideBarProps {
 
 export function SideBar({ children }: SideBarProps) {
   const [openSideBar, setOpenSideBar] = useState(true)
-  const userInfo = useAppSelector((state) => state.usersReducer.user)
+  const userInfo = useAppSelector(selectUserProfile)
+  const projects = useAppSelector(selectProjects)
   const location = useLocation()
 
   return (
@@ -77,7 +78,7 @@ export function SideBar({ children }: SideBarProps) {
                 <img width='40px' height='40px' style={{ borderRadius: '2px' }} src={image_profile} alt='no image' />
                 <Box>
                   <Typography variant='subtitle1' fontWeight='500'>
-                    {userInfo?.firstName + ' ' + userInfo?.lastName}{' '}
+                    {userInfo?.user?.firstName + ' ' + userInfo?.user?.lastName}
                   </Typography>
                   <Typography variant='subtitle2'>Software Developer</Typography>
                 </Box>
@@ -203,17 +204,7 @@ export function SideBar({ children }: SideBarProps) {
               </Box>
 
               <Box height='calc(54vh - 4px)' overflow='auto'>
-                <ButtonProjectItem name='My project 1' />
-                <ButtonProjectItem name='My project 2' />
-                <ButtonProjectItem name='My project 3' />
-                <ButtonProjectItem name='My project 3' />
-                <ButtonProjectItem name='My project 5' />
-                <ButtonProjectItem name='My project 6' />
-                <ButtonProjectItem name='My project 6' />
-                <ButtonProjectItem name='My project 6' />
-                <ButtonProjectItem name='My project 6' />
-                <ButtonProjectItem name='My project 6' />
-                <ButtonProjectItem name='My project 6' />
+                {projects?.map((item) => <ButtonProjectItem item={item} />)}
               </Box>
             </Box>
           </Box>

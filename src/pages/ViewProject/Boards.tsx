@@ -17,8 +17,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '~/hooks'
 import { PermissionProject, ProjectInfoOutput, projectService } from '~/services/project'
 import { selectAllProject, setLoading, setProjects, setProjectsAdmin, setProjectsMember } from '~/store/reducers'
-import { CardBoards } from './CardBoards'
-import { CreateProjectModal } from './CreateProjectModal'
+import { CardBoards, CreateProjectModal, UpdateProjectModal } from './components'
 
 export function ViewProjectBoards() {
   const [filterBy, setFilterBy] = useState('2')
@@ -29,7 +28,7 @@ export function ViewProjectBoards() {
   const [searchInput, setSearchInput] = useState('')
 
   const currentTableData: ProjectInfoOutput[] = useMemo(() => {
-    if (data && data.length > 0) {
+    if (data && data) {
       const newData = data.filter((item) => item.name.toLowerCase().includes(searchInput.toLowerCase()))
       return newData
     }
@@ -38,9 +37,15 @@ export function ViewProjectBoards() {
 
   const [openModalCreate, setOpenModalCreate] = useState(false)
   const handleOpenModalCreate = () => setOpenModalCreate(true)
-  const handleCloseModalCreate = () => {
-    setOpenModalCreate(false)
+  const handleCloseModalCreate = () => setOpenModalCreate(false)
+
+  const [itemUpdate, setItemUpdate] = useState<ProjectInfoOutput>()
+  const [openModalUpdate, setOpenModalUpdate] = useState(false)
+  const handleOpenModalUpdate = (item: ProjectInfoOutput) => {
+    setItemUpdate(item)
+    setOpenModalUpdate(true)
   }
+  const handleCloseModalUpdate = () => setOpenModalUpdate(false)
 
   const handleChangeFilter = (event: SelectChangeEvent) => {
     const value = event.target.value
@@ -50,8 +55,6 @@ export function ViewProjectBoards() {
     if (Number(value) === PermissionProject.ADMINISTRATOR) fetchDataGetAllProjectAdmin()
     else if (Number(value) === PermissionProject.MEMBER) fetchDataGetAllProjectMember()
     else fetchDataGetAllProject()
-
-    console.log(event.target.value)
   }
 
   const handleChangeSearchInput = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -59,7 +62,7 @@ export function ViewProjectBoards() {
   }
 
   const fetchDataGetAllProject = async () => {
-    if (projects.length > 0) {
+    if (projects) {
       setData(projects)
       return
     }
@@ -69,7 +72,6 @@ export function ViewProjectBoards() {
       const res = await projectService.getAllByUser()
       setData(res.data.slice().reverse())
       dispatch(setProjects(res.data.slice().reverse()))
-
       console.log(res)
     } catch (error) {
       console.log(error)
@@ -79,7 +81,7 @@ export function ViewProjectBoards() {
   }
 
   const fetchDataGetAllProjectAdmin = async () => {
-    if (projectsAdmin.length > 0) {
+    if (projectsAdmin) {
       setData(projectsAdmin)
       return
     }
@@ -99,7 +101,7 @@ export function ViewProjectBoards() {
   }
 
   const fetchDataGetAllProjectMember = async () => {
-    if (projectsMember.length > 0) {
+    if (projectsMember) {
       setData(projectsMember)
       return
     }
@@ -167,10 +169,15 @@ export function ViewProjectBoards() {
       </Box>
 
       <Box display='flex' flexWrap='wrap' gap='2%' px='5px'>
-        {currentTableData?.map((item) => <CardBoards key={item.id} item={item} />)}
+        {currentTableData?.map((item) => (
+          <CardBoards key={item.id} item={item} handleOpenModalUpdate={handleOpenModalUpdate} />
+        ))}
       </Box>
 
       {openModalCreate && <CreateProjectModal open={openModalCreate} handleClose={handleCloseModalCreate} />}
+      {openModalUpdate && itemUpdate && (
+        <UpdateProjectModal projectInfo={itemUpdate} open={openModalUpdate} handleClose={handleCloseModalUpdate} />
+      )}
     </Box>
   )
 }

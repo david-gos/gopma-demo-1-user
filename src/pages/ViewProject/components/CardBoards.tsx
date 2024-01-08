@@ -10,19 +10,21 @@ import { Box, Card, Divider, Icon, IconButton, Menu, MenuItem, Typography } from
 import Avatar from '@mui/material/Avatar'
 import AvatarGroup from '@mui/material/AvatarGroup'
 import { AxiosError } from 'axios'
-import { MouseEventHandler, useState } from 'react'
+import { MouseEventHandler, useEffect, useState } from 'react'
 import { bg_card3 } from '~/assets/image'
-import { useAppDispatch, useToast } from '~/hooks'
+import { useAppDispatch, useAppSelector, useToast } from '~/hooks'
 import { ProjectInfoOutput, projectService } from '~/services/project'
-import { setLoading } from '~/store/reducers'
+import { addNewProject, deleteProject, removeAlert, selectAlert, setAlert, setLoading } from '~/store/reducers'
 
 interface CardBoardsProps {
   item: ProjectInfoOutput
+  handleOpenModalUpdate: (item: ProjectInfoOutput) => void
 }
 
-export function CardBoards({ item }: CardBoardsProps) {
+export function CardBoards({ item, handleOpenModalUpdate }: CardBoardsProps) {
   const dispatch = useAppDispatch()
   const toast = useToast()
+  const selectAlertSlice = useAppSelector(selectAlert)
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -35,10 +37,11 @@ export function CardBoards({ item }: CardBoardsProps) {
     setAnchorEl(null)
   }
 
-  const handleOnDeleteItem = async () => {
+  const fetchDataDeleteItem = async () => {
     dispatch(setLoading(true))
     try {
       const res = await projectService.deleteProject(item.id)
+      dispatch(deleteProject({ id: item.id }))
       toast({ message: res.message, status: 'success' })
     } catch (error) {
       const errorAxios = error as AxiosError
@@ -46,23 +49,60 @@ export function CardBoards({ item }: CardBoardsProps) {
       toast({ message: errorAxios.message, status: 'error' })
     } finally {
       dispatch(setLoading(false))
-      setAnchorEl(null)
+      dispatch(removeAlert())
     }
   }
+
+  const handleDuplicateItem = async () => {
+    dispatch(setLoading(true))
+    try {
+      const res = await projectService.createProject({ name: item.name })
+      toast({ message: 'Duplicate successful projects', status: 'success' })
+      dispatch(addNewProject(res.data))
+      handleClose()
+    } catch (error) {
+      const errorAxios = error as AxiosError
+      toast({ message: errorAxios.message, status: 'error' })
+    } finally {
+      dispatch(setLoading(false))
+    }
+  }
+
+  const handleDeleteItem = async () => {
+    dispatch(
+      setAlert({
+        isOpen: true,
+        title: 'Are you sure?',
+        content: 'You cannot undo it once deleted.',
+        id: item.id
+      })
+    )
+    setAnchorEl(null)
+  }
+
+  useEffect(() => {
+    if (!selectAlertSlice.isOpen && selectAlertSlice.confirm && selectAlertSlice.id === item.id) fetchDataDeleteItem()
+  }, [selectAlertSlice])
   return (
     <Card
-      key={item.id}
+      onDoubleClick={() => {
+        console.log('a')
+      }}
       sx={{
         width: '32%',
+        minWidth: '250px',
         height: '10rem',
         p: '10px',
         mb: '30px',
-        background: `url(${bg_card3}) center/cover no-repeat`
+        background: `url(${bg_card3}) center/cover no-repeat`,
+        ':hover': {
+          cursor: 'pointer',
+          opacity: '0.98'
+        }
       }}
     >
       <Box
         sx={{
-          // backgroundColor: 'rgba(0, 0, 0, 0.4)',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
@@ -90,7 +130,11 @@ export function CardBoards({ item }: CardBoardsProps) {
               <StarRoundedIcon fontSize='small' />
             </Icon>
 
-            <Typography variant='h5' color='white'>
+            <Typography
+              variant='h5'
+              color='white'
+              sx={{ width: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
               {item.name}
             </Typography>
           </Box>
@@ -100,11 +144,18 @@ export function CardBoards({ item }: CardBoardsProps) {
           </IconButton>
 
           <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-            <MenuItem disableRipple sx={{ gap: '10px' }}>
+            <MenuItem
+              disableRipple
+              sx={{ gap: '10px' }}
+              onClick={() => {
+                handleClose()
+                handleOpenModalUpdate(item)
+              }}
+            >
               <EditIcon />
               Edit
             </MenuItem>
-            <MenuItem disableRipple sx={{ gap: '10px' }}>
+            <MenuItem disableRipple sx={{ gap: '10px' }} onClick={handleDuplicateItem}>
               <FileCopyIcon />
               Duplicate
             </MenuItem>
@@ -113,7 +164,7 @@ export function CardBoards({ item }: CardBoardsProps) {
               Invite members
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
-            <MenuItem disableRipple sx={{ gap: '10px', color: '#d32f2f' }} onClick={handleOnDeleteItem}>
+            <MenuItem disableRipple sx={{ gap: '10px', color: '#d32f2f' }} onClick={handleDeleteItem}>
               <DeleteIcon color='error' />
               Delete
             </MenuItem>

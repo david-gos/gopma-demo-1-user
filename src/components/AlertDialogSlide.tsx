@@ -20,7 +20,7 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction='up' ref={ref} {...props} />
 })
 
-export default function AlertDialogSlide() {
+export function AlertDialogSlide() {
   const select = useAppSelector(selectAlert)
   const dispatch = useDispatch()
 
@@ -46,7 +46,7 @@ export default function AlertDialogSlide() {
           </Button>
           <Button
             onClick={() => {
-              dispatch(setCloseAlert({ confirm: true }))
+              dispatch(setCloseAlert({ confirm: true, id: select.id }))
             }}
           >
             Agree

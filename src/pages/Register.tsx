@@ -8,12 +8,11 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
-
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
 import { useAppDispatch, useToast } from '~/hooks'
 import { authService } from '~/services'
 import { CreateUserInput } from '~/services/auth/dto'
-import { GENDER } from '~/services/user/dto'
+import { gender } from '~/services/user'
 import { setLoading } from '~/store/reducers'
 
 const schema = yup.object({
@@ -32,21 +31,6 @@ const schema = yup.object({
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('Password is required')
 })
-
-const gender = [
-  {
-    value: GENDER.MALE,
-    title: 'Male'
-  },
-  {
-    value: GENDER.FEMALE,
-    title: 'Female'
-  },
-  {
-    value: GENDER.OTHER,
-    title: 'Other'
-  }
-]
 
 export function RegisterPage() {
   const {
@@ -83,6 +67,8 @@ export function RegisterPage() {
   }
 
   const onSubmitRegister = async (dataInput: CreateUserInput): Promise<void> => {
+    console.log(dataInput)
+
     handleSubmitRegister(dataInput)
   }
 

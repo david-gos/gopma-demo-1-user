@@ -30,7 +30,7 @@ export function CreateProjectModal({ open, handleClose }: CreateProjectModalProp
   const toast = useToast()
 
   const onSubmitCreateProject = async (dataInput: CreateProjectInput) => {
-    console.log(dataInput)
+    dispatch(setLoading(true))
     try {
       const res = await projectService.createProject(dataInput)
       toast({ message: 'Create successful projects', status: 'success' })

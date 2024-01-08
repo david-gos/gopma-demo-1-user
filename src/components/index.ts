@@ -1,3 +1,4 @@
+export * from './AlertDialogSlide'
 export * from './AuthProvider'
 export * from './AuthenBackground'
 export * from './AuthenForm'
