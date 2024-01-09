@@ -2,8 +2,18 @@ import { useState } from 'react'
 
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { FilledInput, FormControl, IconButton, InputAdornment, InputLabel } from '@mui/material'
+import { FieldErrors } from 'react-hook-form'
+import { CreateUserInput } from '~/services/auth/dto'
 
-export function InputFieldCT(_props: any) {
+interface InputFieldCTProps {
+  title: string
+  nameField: keyof CreateUserInput
+  register: any
+  typePassword: boolean
+  errors: FieldErrors<CreateUserInput>
+}
+
+export function InputFieldCT(_props: InputFieldCTProps) {
   const { title, typePassword, errors, nameField, register } = _props
   const [showPassword, setShowPassword] = useState(false)
   const [value] = useState('')

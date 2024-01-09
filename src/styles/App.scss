@@ -58,3 +58,34 @@ body {
   // --xxlarge: 48px;
   // --xxxlarge: 96px
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #dfe0e0;
+  border-radius: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+  cursor: pointer;
+}
+
+.active{
+  background-color: #DCDFE4;
+  height: 100%;
+}
+
+.inactive{
+  background-color: #fff;
+}

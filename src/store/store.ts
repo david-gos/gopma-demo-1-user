@@ -1,12 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
-import example from './reducers/example'
+import { loadingSlice, projectSlice, userSlice } from './reducers'
+import { alertSlice } from './reducers/AlertSlice'
 
-const rootReducer = {
-  example: example
-}
-
-const store = configureStore({
-  reducer: rootReducer
+export const store = configureStore({
+  reducer: {
+    usersReducer: userSlice.reducer,
+    loadingReducer: loadingSlice.reducer,
+    projectReducer: projectSlice.reducer,
+    alertReducer: alertSlice.reducer
+  }
 })
 
-export default store
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

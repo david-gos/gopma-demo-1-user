@@ -5,10 +5,23 @@ import { LoadingButton } from '@mui/lab'
 import { Box, Button, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 
-import { LoadingComponent } from '.'
+import { ReactNode } from 'react'
+import { useAppSelector } from '~/hooks'
+import { selectLoading } from '~/store/reducers'
 
-export function AuthenForm(_props: any) {
-  const { isSignUp, handleSubmit, onSubmitForm, isLoading, title, formDescription } = _props
+interface AuthenFormProps {
+  isSignUp?: boolean
+  handleSubmit: any
+  onSubmitForm: (dataInput: any) => Promise<void>
+  children: ReactNode
+  title: string
+  formDescription: string
+}
+
+export function AuthenForm(props: AuthenFormProps) {
+  const { isSignUp, title, formDescription, handleSubmit, onSubmitForm, children } = props
+
+  const select = useAppSelector(selectLoading)
 
   return (
     <Box sx={{ width: '800px', minWidth: '500px', overflow: 'auto' }}>
@@ -66,7 +79,7 @@ export function AuthenForm(_props: any) {
           </Typography>
         </Box>
         <Box component='form' onSubmit={handleSubmit(onSubmitForm)}>
-          {_props.children}
+          {children}
           <Box>
             <Box sx={{ textAlignLast: 'center' }}>
               {!isSignUp && (
@@ -84,10 +97,10 @@ export function AuthenForm(_props: any) {
               <div>
                 <LoadingButton
                   type='submit'
-                  loading={isLoading}
+                  loading={select.isLoading}
                   loadingPosition='center'
                   variant='contained'
-                  disabled={isLoading}
+                  disabled={select.isLoading}
                   sx={{ width: '100%', marginTop: '.4rem' }}
                 >
                   <span>{title}</span>
@@ -97,7 +110,6 @@ export function AuthenForm(_props: any) {
           </Box>
         </Box>
       </Box>
-      <LoadingComponent isLoading={isLoading} />
     </Box>
   )
 }

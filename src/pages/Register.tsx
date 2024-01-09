@@ -2,16 +2,18 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Card, FilledInput, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { AxiosError } from 'axios'
 import { Dayjs } from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
-
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
-import { DataResponse, useAxios, useToast } from '~/hooks'
-import { Gender } from '~/utils'
-import { CreateUserInput } from '~/utils/schema'
+import { useAppDispatch, useToast } from '~/hooks'
+import { authService } from '~/services'
+import { CreateUserInput } from '~/services/auth/dto'
+import { gender } from '~/services/user'
+import { setLoading } from '~/store/reducers'
 
 const schema = yup.object({
   email: yup.string().email('This field must be a Email').required('Email is required'),
@@ -30,21 +32,6 @@ const schema = yup.object({
     .required('Password is required')
 })
 
-const gender = [
-  {
-    value: Gender.MALE,
-    title: 'Male'
-  },
-  {
-    value: Gender.FEMALE,
-    title: 'Female'
-  },
-  {
-    value: Gender.OTHER,
-    title: 'Other'
-  }
-]
-
 export function RegisterPage() {
   const {
     register,
@@ -53,9 +40,8 @@ export function RegisterPage() {
     formState: { errors }
   } = useForm<CreateUserInput>({ resolver: yupResolver(schema) })
 
-  const { response, error, isLoading, fetchData } = useAxios<DataResponse>('post', '/auth/register')
   const toast = useToast()
-  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
   const [selected, setSelected] = useState('')
   const navigate = useNavigate()
 
@@ -63,22 +49,28 @@ export function RegisterPage() {
     setSelected(event.target.value)
   }
 
-  const onSubmitRegister = async (dataInput: object) => {
-    fetchData(dataInput)
-  }
+  const handleSubmitRegister = async (dataInput: CreateUserInput) => {
+    dispatch(setLoading(true))
+    try {
+      await authService.register(dataInput)
 
-  useEffect(() => {
-    setLoading(isLoading)
-    if (response) {
-      console.log(response)
       navigate('/login')
       toast({ message: 'Register successful! You can login now.', status: 'success' })
-    }
+    } catch (error) {
+      const axiosError = error as AxiosError
 
-    if (error) {
-      toast({ message: error.message, status: 'error' })
+      toast({ message: axiosError.message, status: 'error' })
+      console.log(axiosError)
+    } finally {
+      dispatch(setLoading(false))
     }
-  }, [response, error, isLoading])
+  }
+
+  const onSubmitRegister = async (dataInput: CreateUserInput): Promise<void> => {
+    console.log(dataInput)
+
+    handleSubmitRegister(dataInput)
+  }
 
   return (
     <Card sx={{ display: 'flex', width: '950px', minWidth: '300px', height: '98vh' }}>
@@ -86,7 +78,6 @@ export function RegisterPage() {
         title='Sign Up'
         formDescription='or use your email for registration:'
         isSignUp
-        isLoading={loading}
         handleSubmit={handleSubmit}
         onSubmitForm={onSubmitRegister}
       >

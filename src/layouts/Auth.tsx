@@ -9,7 +9,6 @@ export function AuthLayout() {
 
   if (isAuth) return <Navigate to='/' replace />
 
-  console.log('auth')
   return (
     <Grid container component='main' sx={{ height: '100vh' }}>
       <Grid item xs={12}>

@@ -1,12 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Card, FilledInput, FormControl, InputLabel } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
 import { AuthenBackground, AuthenForm, InputFieldCT } from '~/components'
-import { DataResponse, useAuth, useAxios, useToast } from '~/hooks'
-import { LoginUserInput } from '~/utils/schema'
+import { useAppDispatch, useAuth, useToast } from '~/hooks'
+import { authService } from '~/services'
+import { LoginUserInput } from '~/services/auth/dto'
+import { setLoading } from '~/store/reducers'
 
 const schema = yup.object({
   username: yup.string().required('Username is required'),
@@ -20,44 +22,37 @@ export function LoginPage() {
     formState: { errors }
   } = useForm<LoginUserInput>({ resolver: yupResolver(schema) })
 
-  const { response, error, isLoading, fetchData } = useAxios<DataResponse>('post', '/auth/login')
   const { login } = useAuth()
   const toast = useToast()
-  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
 
-  const onSubmitLogin = async (dataInput: LoginUserInput) => {
-    fetchData(dataInput)
+  const handleSubmitLogin = async (dataInput: LoginUserInput) => {
+    dispatch(setLoading(true))
+    try {
+      const response = await authService.login(dataInput)
+      console.log(response)
+
+      toast({ message: 'Login successful!', status: 'success' })
+      login(response.data.accessToken)
+    } catch (error) {
+      const axiosError = error as AxiosError
+      toast({ message: axiosError.message, status: 'error' })
+
+      console.log(axiosError)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  useEffect(() => {
-    setLoading(isLoading)
-    if (response) {
-      console.log(response)
-      toast({ message: 'Login successful!', status: 'success' })
-      login(response?.accessToken)
-    }
-  }, [isLoading])
-
-  useEffect(() => {
-    setLoading(isLoading)
-
-    if (error) {
-      console.log(error)
-
-      toast({ message: error.message, status: 'error' })
-    }
-  }, [error])
-
-  useEffect(() => {
-    setLoading(isLoading)
-  }, [isLoading])
+  const onSubmitLogin = async (dataInput: LoginUserInput) => {
+    handleSubmitLogin(dataInput)
+  }
 
   return (
     <Card sx={{ display: 'flex', width: '950px', minWidth: '300px', height: '98vh' }}>
       <AuthenForm
         title={'Sign In'}
         formDescription={'or use your account:'}
-        isLoading={loading}
         handleSubmit={handleSubmit}
         onSubmitForm={onSubmitLogin}
       >
